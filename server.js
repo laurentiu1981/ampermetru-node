@@ -45,13 +45,7 @@ io.sockets.on('connection', function(socket) {
     // Make a request to Spark
     console.log(data);
   });
-  socket.on('display CPU', function() {
-    io.sockets.volatile.emit('CPU selected', true);
-  });
-  socket.on('display MEM', function() {
-    io.sockets.volatile.emit('MEM selected', true);
-  });
-  socket.on('display HDD', function() {
-    io.sockets.volatile.emit('HDD selected', true);
+  socket.on('display change', function(data) {
+    io.sockets.volatile.emit('changed display', data);
   });
 });

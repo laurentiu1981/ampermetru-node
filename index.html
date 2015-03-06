@@ -14,26 +14,21 @@
                 var id = jQuery(e.target).attr('id');
                 console.log('change display: ' + id);
                 var action_param = id.replace('select-', '');
-                socket.emit('display ' + action_param.toUpperCase(), true);
+                socket.emit('display change', action_param.toUpperCase());
             })
         });
 
         function attachEventsOnSocket(socket) {
             socket.on('connect', function() {
                 console.log('here');
-                socket.on('CPU selected', function(data) {
-                    console.log('data');
-                });
-                socket.on('MEM selected', function(data) {
-                    console.log('data');
-                });
-                socket.on('HDD selected', function(data) {
-                    console.log('data');
+                socket.on('changed display', function(data) {
+                    updateLeds(data);
                 });
             });
-            socket.on('CPU selected', function(data) {
-                console.log('data');
-            });
+        }
+
+        function updateLeds(data) {
+            console.log(data);
         }
 
 
