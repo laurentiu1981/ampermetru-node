@@ -1,1 +1,47 @@
-Test
+<html>
+<head>
+    <script src="node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js"></script>
+    <script src="jquery-1.7.2.js"></script>
+    <script>
+        var socket;
+        jQuery(document).ready(function() {
+            socket = io.connect('http://overdoser.org:6555');
+            attachEventsOnSocket(socket);
+
+            jQuery('.change-display').on('click', function(e) {
+                e.preventDefault();
+
+                var id = jQuery(e.target).attr('id');
+                console.log('change display: ' + id);
+                var action_param = id.replace('select-', '');
+                socket.emit('display ' + action_param.toUpperCase(), true);
+            })
+        });
+
+        function attachEventsOnSocket(socket) {
+            socket.on('connect', function() {
+                console.log('here');
+                socket.on('CPU selected', function(data) {
+                    console.log('data');
+                });
+                socket.on('MEM selected', function(data) {
+                    console.log('data');
+                });
+                socket.on('HDD selected', function(data) {
+                    console.log('data');
+                });
+            });
+            socket.on('CPU selected', function(data) {
+                console.log('data');
+            });
+        }
+
+
+    </script>
+</head>
+<body>
+<a id="select-cpu" class="change-display" href="">CPU</a>
+<a id="select-mem" class="change-display" href="">MEM</a>
+<a id="select-hdd" class="change-display" href="">HDD</a>
+</body>
+</html>
