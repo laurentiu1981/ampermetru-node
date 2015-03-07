@@ -106,8 +106,10 @@ io.sockets.on('connection', function (socket) {
     netDataHandler(serverData);
   });
   socket.on('hostname change', function (data) {
-    currentHost = data;
-    io.sockets.volatile.emit('changed hostname', data);
+    if (hosts.hasOwnProperty(data)) {
+      currentHost = data;
+    }
+    io.sockets.volatile.emit('changed hostname', currentHost);
     netDataHandler(serverData);
   });
 });
