@@ -1,5 +1,6 @@
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="/css/style.css"/>
     <script src="node_modules/socket.io/node_modules/socket.io-client/dist/socket.io.js"></script>
     <script src="jquery-1.7.2.js"></script>
     <script>
@@ -29,14 +30,20 @@
 
         function updateLeds(data) {
             console.log(data);
+            var id = '#select-' + data.toLowerCase();
+            jQuery('.change-display').removeClass('selected');
+            jQuery(id).addClass('selected');
         }
 
 
     </script>
 </head>
 <body>
-<a id="select-cpu" class="change-display" href="">CPU</a>
-<a id="select-mem" class="change-display" href="">MEM</a>
-<a id="select-hdd" class="change-display" href="">HDD</a>
+<div id="controllers-wrapper">
+    <a id="select-cpu" class="change-display" href="">CPU</a>
+    <a id="select-mem" class="change-display" href="">MEM</a>
+    <a id="select-hdd" class="change-display" href="">HDD</a>
+</div>
+
 </body>
 </html>
