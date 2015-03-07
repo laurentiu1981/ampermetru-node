@@ -48,7 +48,7 @@ function netDataHandler(data) {
     serverData = data;
     io.sockets.volatile.emit('update values', displayType + "|" + serverData);
 console.log(serverData);
-    var host = serverData.split('|').slice(-1).pop();
+    var host = serverData.toString().split('|').slice(-1).pop();
     if (!hosts.hasOwnProperty(host) ) {
         io.sockets.volatile.emit('update hosts', host);
     }
