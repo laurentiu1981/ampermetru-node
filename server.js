@@ -16,8 +16,10 @@ var apiToken = 'fc38c2dde5b8a98f2628a851bc6389122d3b4ab2';
 var WS_PORT = 6555;
 var NET_PORT = 7555;
 
-var displayType;
+var displayType = 'MEM';
+var currentHost;
 var serverData;
+var hosts;
 
 // creating the server ( localhost:8000 )
 app.listen(WS_PORT);
@@ -44,11 +46,19 @@ function handler(req, res) {
 function netDataHandler(data) {
     serverData = data;
     io.sockets.volatile.emit('update values', displayType + "|" + serverData);
+
+    var host = serverData.split('|').slice(-1).pop();
+    if (!hosts.hasOwnProperty(host) ) {
+        io.sockets.volatile.emit('update hosts', host);
+    }
+    hosts[host] = serverData;
+    currentHost = currentHost ? currentHost : host;
+    
     console.log(data);
     var postData = querystring.stringify({
       'access_token' : apiToken,
       // Concatenate display option as suffix for serverData.
-      'command': displayType + "|" + serverData
+      'command': displayType + "|" + hosts[currentHost]
     });
 
     var options = {
