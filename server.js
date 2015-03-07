@@ -56,39 +56,39 @@ function netDataHandler(data) {
   currentHost = currentHost ? currentHost : host;
   if (host == currentHost) {
     io.sockets.volatile.emit('update values', displayType + "|" + hosts[currentHost]);
-  }
 
-  var postData = querystring.stringify({
-    'access_token': apiToken,
-    // Concatenate display option as suffix for serverData.
-    'command': displayType + "|" + hosts[currentHost]
-  });
-
-  var options = {
-    host: apiHost,
-    port: apiPort,
-    path: apiUrl + deviceId + '/led',
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/x-www-form-urlencoded',
-      'Content-Length': postData.length
-    }
-  };
-
-  var req = https.request(options, function (res) {
-    res.setEncoding('utf8');
-    res.on('data', function (chunk) {
-      console.log('BODY: ' + chunk);
+    var postData = querystring.stringify({
+      'access_token': apiToken,
+      // Concatenate display option as suffix for serverData.
+      'command': displayType + "|" + hosts[currentHost]
     });
-  });
 
-  req.on('error', function (e) {
-    console.log('problem with request: ' + e.message);
-    console.log(e.stack)
-  });
+    var options = {
+      host: apiHost,
+      port: apiPort,
+      path: apiUrl + deviceId + '/led',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': postData.length
+      }
+    };
 
-  req.write(postData);
-  req.end();
+    var req = https.request(options, function (res) {
+      res.setEncoding('utf8');
+      res.on('data', function (chunk) {
+        console.log('BODY: ' + chunk);
+      });
+    });
+
+    req.on('error', function (e) {
+      console.log('problem with request: ' + e.message);
+      console.log(e.stack)
+    });
+
+    req.write(postData);
+    req.end();
+  }
 }
 // Get server client data
 net.createServer(function(sock) {
