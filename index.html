@@ -32,9 +32,6 @@
 
         function attachEventsOnSocket(socket) {
             socket.on('connect', function() {
-                socket.on('send hosts', function(hosts) {
-                    console.log(hosts);
-                });
                 console.log('here');
                 socket.on('changed display', function(data) {
                     updateLeds(data);
@@ -111,7 +108,7 @@
                     .replace(/'/g, '&#39;')
                     .replace(/</g, '&lt;')
                     .replace(/>/g, '&gt;');
-        };
+        }
 
     </script>
 </head>
