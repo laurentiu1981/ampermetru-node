@@ -13,18 +13,20 @@ var apiUrl = '/v1/devices/';
 var deviceId = '53ff6f065075535126141387';
 var apiToken = 'fc38c2dde5b8a98f2628a851bc6389122d3b4ab2';
 
+// Application ports
 var WS_PORT = 6555;
 var NET_PORT = 7555;
 
+// Internal Variables
 var displayType = 'MEM';
 var currentHost;
 var serverData;
 var hosts = {};
 
-// creating the server ( localhost:8000 )
+// Creating the server
 app.listen(WS_PORT);
 
-// on server started we can load our client.html page
+// On  the server started we load our index.html page
 function handler(req, res) {
   fs.readFile(__dirname + '/index.html', function(err, data) {
     if(err) {
@@ -48,21 +50,28 @@ function netDataHandler(data) {
   serverData = data;
 
   console.log(serverData);
+
+  //Hostname is client computer name used to identify nodes
   var host = serverData.toString().split('|').slice(-1).pop();
   if (!hosts.hasOwnProperty(host)) {
+    // Notify all websocket clients that a new host is alive
     io.sockets.volatile.emit('update hosts', host);
   }
+
   hosts[host] = serverData;
   currentHost = currentHost ? currentHost : host;
   if (host == currentHost) {
+    // Notify all websocket clients that host vales have arrived
     io.sockets.volatile.emit('update values', displayType + "|" + hosts[currentHost]);
 
+    // Format POST params as urlencoded
     var postData = querystring.stringify({
       'access_token': apiToken,
       // Concatenate display option as suffix for serverData.
       'command': displayType + "|" + hosts[currentHost]
     });
 
+    // Spark HTTPS POST API request options
     var options = {
       host: apiHost,
       port: apiPort,
@@ -74,6 +83,7 @@ function netDataHandler(data) {
       }
     };
 
+    // DO the request and log response data
     var req = https.request(options, function (res) {
       res.setEncoding('utf8');
       res.on('data', function (chunk) {
@@ -98,15 +108,19 @@ net.createServer(function(sock) {
 
 
 
-// creating a new websocket to keep the content updated without any AJAX request
+// Creating a new websocket to keep the content updated without any AJAX request
 io.sockets.on('connection', function (socket) {
-
+  // Sent host list to all websocket clients
   io.sockets.volatile.emit('send hosts', {hosts: Object.keys(hosts), default_host: currentHost});
+
+  // Listen for websocket client meter display change
   socket.on('display change', function (data) {
     displayType = data;
     io.sockets.volatile.emit('changed display', data);
     netDataHandler(serverData);
   });
+
+  // Listen for websocket client hostname display change
   socket.on('hostname change', function (data) {
     if (hosts.hasOwnProperty(data)) {
       currentHost = data;
