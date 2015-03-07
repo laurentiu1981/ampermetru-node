@@ -2,12 +2,21 @@
 var app = require('http').createServer(handler)
 , fs = require('fs')
 , io = require('socket.io').listen(app)
-, net = require('net');
+, net = require('net')
+, https = require("https")
+, querystring = require('querystring');
+
+// Spark data
+var apiHost = 'api.spark.io';
+var apiPort = 443;
+var apiUrl = '/v1/devices/';
+var deviceId = '53ff6f065075535126141387';
+var apiToken = 'fc38c2dde5b8a98f2628a851bc6389122d3b4ab2';
 
 var WS_PORT = 6555;
 var NET_PORT = 7555;
 
-var server_data;
+var serverData;
 
 // creating the server ( localhost:8000 )
 app.listen(WS_PORT);
@@ -30,8 +39,43 @@ function handler(req, res) {
 net.createServer(function(sock) {
     // Add a 'data' event handler to this instance of socket
     sock.on('data', function(data) {
-        server_data = data;
+        serverData = data;
         console.log('DATA ' + sock.remoteAddress + ': ' + data);
+        //io.sockets.volatile.emit('data', data);
+
+
+        var postData = querystring.stringify({
+            'access_token' : apiToken,
+            'command': '' + serverData
+        });
+
+        var options = {
+            host: apiHost,
+            port: apiPort,
+            path: apiUrl + deviceId + '/led',
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded',
+                'Content-Length': postData.length
+            }
+        };
+
+
+        console.log(postData)
+        var req = https.request(options, function(res) {
+            res.setEncoding('utf8');
+            res.on('data', function (chunk) {
+                console.log('BODY: ' + chunk);
+            });
+        });
+
+        req.on('error', function(e) {
+            console.log('problem with request: ' + e.message);
+            console.log(e.stack)
+        });
+
+        req.write(postData);
+        req.end();
 
     });
 }).listen(NET_PORT);
