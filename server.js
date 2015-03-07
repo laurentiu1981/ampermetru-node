@@ -98,6 +98,7 @@ net.createServer(function(sock) {
 // creating a new websocket to keep the content updated without any AJAX request
 io.sockets.on('connection', function (socket) {
 
+  io.sockets.volatile.emit('send hosts', hosts);
   socket.on('display change', function (data) {
     displayType = data;
     io.sockets.volatile.emit('changed display', data);
