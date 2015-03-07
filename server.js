@@ -43,8 +43,8 @@ function handler(req, res) {
  */
 function netDataHandler(data) {
     serverData = data;
-    //io.sockets.volatile.emit('data', data);
-
+    io.sockets.volatile.emit('update values', displayType + "|" + serverData);
+    console.log(data);
     var postData = querystring.stringify({
       'access_token' : apiToken,
       // Concatenate display option as suffix for serverData.
