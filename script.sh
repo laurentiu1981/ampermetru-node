@@ -1,5 +1,8 @@
 #!/bin/bash
 # Server Monitoring
+
+# Use this and the lines bellow to keep permanent socket
+#exec 5<>/dev/tcp/overdoser.org/7555
 if [ "$(uname -s)" = "Linux" ]
 then
 	while [ : ]
@@ -10,7 +13,8 @@ then
 		HDD="$(df -h / | awk '/^\/dev\// { print substr($5, 1, length($5)-1) }')"
 		SSH="$(netstat -an | grep -E "\:22[ \t]+" | grep ESTABLISHED | wc -l)"
 		echo "CPU= ${CPU}| MEM= ${MEM}| HDD= ${HDD}| SSH= ${SSH} | HOST= $(hostname)"
-		echo -n "${CPU}|${MEM}|${HDD}|${SSH}|$(hostname)" > /dev/tcp/overdoser.org/7555
+		#echo -n "${CPU}|${MEM}|${HDD}|${SSH}|$(hostname)" >&5
+		echo -n "${CPU}|${MEM}|${HDD}|${SSH}|$(hostname)" >/dev/tcp/overdoser.org/7555
 	done
 elif [ "$(uname -s)" = "Darwin" ]
 then
@@ -22,6 +26,7 @@ then
 		HDD="$(df -h / | awk '/^\/dev\// { print substr($5, 0, length($5)-1) }')"
 		SSH="$(netstat -an | grep -E "\:22[ \t]+" | grep ESTABLISHED | wc -l)"
 		echo "CPU= ${CPU}| MEM= ${MEM}| HDD= ${HDD}| SSH= ${SSH} | HOST= $(hostname)"
-		echo -n "${CPU}|${MEM}|${HDD}|${SSH}|$(hostname)" > /dev/tcp/overdoser.org/7555
+		#echo -n "${CPU}|${MEM}|${HDD}|${SSH}|$(hostname)" >&5
+		echo -n "${CPU}|${MEM}|${HDD}|${SSH}|$(hostname)" >/dev/tcp/overdoser.org/7555
 	done
 fi
