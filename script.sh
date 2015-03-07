@@ -17,7 +17,7 @@ then
 	while [ : ]
 	do
 		sleep 1s
-		CPU="$(top -l 1 | grep "CPU usage" | tail -n 1 | awk '{print $5 + $7}')"
+		CPU="$(top -l 1 | grep "CPU usage" | tail -n 1 | awk '{print $3 + $5}')"
 		MEM="$(./mac_mem.rb)"
 		HDD="$(df -h / | awk '/^\/dev\// { print substr($5, 0, length($5)-1) }')"
 		SSH="$(netstat -an | grep -E "\:22[ \t]+" | grep ESTABLISHED | wc -l)"
