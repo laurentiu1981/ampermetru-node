@@ -13,7 +13,7 @@
             cpuValue = jQuery('.cpu-value');
             memValue = jQuery('.mem-value');
             hddValue = jQuery('.hdd-value');
-            container = jQuery('table#hosts');
+            container = jQuery('table#hosts tbody');
             socket = io.connect('http://overdoser.org:6555');
             attachEventsOnSocket(socket);
 
@@ -130,6 +130,7 @@
     <th>HDD</th>
     <th>SSH</th>
     </thead>
+    <tbody></tbody>
 </table>
 </form>
 
