@@ -5,7 +5,15 @@
     <script src="jquery-1.7.2.js"></script>
     <script>
         var socket;
+        var cpuValue = jQuery('.cpu-value');
+        var memValue = jQuery('.mem-value');
+        var hddValue = jQuery('.hdd-value');
+        var container = jQuery('table#hosts');
         jQuery(document).ready(function() {
+            cpuValue = jQuery('.cpu-value');
+            memValue = jQuery('.mem-value');
+            hddValue = jQuery('.hdd-value');
+            container = jQuery('table#hosts');
             socket = io.connect('http://overdoser.org:6555');
             attachEventsOnSocket(socket);
 
@@ -28,8 +36,17 @@
                 socket.on('changed display', function(data) {
                     updateLeds(data);
                 });
+                socket.on('send hosts', function(data) {
+                    setHosts(data);
+                });
                 socket.on('changed hostname', function(data) {
+                    changeDefaultHost(data);
+                });
+                socket.on('update hosts', function(data) {
                     updateHosts(data);
+                });
+                socket.on('update values', function(data) {
+                    updateValues(data);
                 });
             });
         }
@@ -41,8 +58,45 @@
             jQuery(id).addClass('selected');
         }
 
+        function updateValues(data) {
+            console.log(data);
+            var values = data.split('|');
+            cpuValue.val(values[1]);
+            memValue.val(values[2]);
+            hddValue.val(values[3]);
+        }
+
         function updateHosts(data) {
             console.log(data);
+            var row = jQuery('<tr>', {rel: hosts[i]}).append('<td>' + data + '</td>' +
+            '<td><input type="text" class="cpu-value" class="value-box" value="0"/></td>' +
+            '<td><input type="text" class="mem-value" class="value-box" value="0"/></td>' +
+            '<td><input type="text" class="hdd-value" class="value-box" value="0"/></td>' +
+            '<td><input type="text" class="ssh-value" class="value-box" value="0"/></td>');
+            container.append(row);
+        }
+
+        function setHosts(hosts) {
+            console.log(hosts);
+            debugger;
+            container.empty();
+            for(var i in hosts.hosts) {
+                var row = jQuery('<tr>', {rel: hosts[i]}).append('<td>' + hosts[i] + '</td>' +
+                '<td><input type="text" class="cpu-value" class="value-box" value="0"/></td>' +
+                '<td><input type="text" class="mem-value" class="value-box" value="0"/></td>' +
+                '<td><input type="text" class="hdd-value" class="value-box" value="0"/></td>'+
+                '<td><input type="text" class="ssh-value" class="value-box" value="0"/></td>');
+                container.append(row);
+                changeDefaultHost(hosts.default_host);
+            }
+
+        }
+
+        function changeDefaultHost(host) {
+            cpuValue = jQuery('tr[rel="' + host + '"] .cpu-value');
+            memValue = jQuery('tr[rel="' + host + '"] .mem-value');
+            hddValue = jQuery('tr[rel="' + host + '"] .hdd-value');
+            jQuery('tr[rel="' + host + '"]').addClass('active');
         }
 
 
@@ -54,6 +108,18 @@
     <a id="select-mem" class="change-display" href="">MEM</a>
     <a id="select-hdd" class="change-display" href="">HDD</a>
 </div>
+<form>
+<table id="hosts" border="1" width="500">
+    <thead>
+    <th>Hosts</th>
+    <th>CPU</th>
+    <th>MEM</th>
+    <th>HDD</th>
+    <th>SSH</th>
+    </thead>
+</table>
+</form>
+
 
 </body>
 </html>

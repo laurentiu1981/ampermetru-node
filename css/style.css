@@ -9,3 +9,11 @@
   margin: 0 auto;
   width: 300px;
 }
+
+table#hosts {
+  margin: 0 auto;
+}
+
+tr.active td {
+  background-color: green;
+}
