@@ -43,7 +43,6 @@ function handler(req, res) {
  */
 function netDataHandler(data) {
     serverData = data;
-    console.log('DATA ' + sock.remoteAddress + ': ' + data);
     //io.sockets.volatile.emit('data', data);
 
     var postData = querystring.stringify({
