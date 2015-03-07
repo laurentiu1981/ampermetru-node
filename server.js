@@ -44,6 +44,9 @@ function handler(req, res) {
  *   Values using pattern: CPU|MEM|SSH|HOSTNAME
  */
 function netDataHandler(data) {
+  if (!data) {
+    return;
+  }
     serverData = data;
     io.sockets.volatile.emit('update values', displayType + "|" + serverData);
 
