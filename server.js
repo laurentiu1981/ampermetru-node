@@ -88,11 +88,16 @@ net.createServer(function(sock) {
 
 
 // creating a new websocket to keep the content updated without any AJAX request
-io.sockets.on('connection', function(socket) {
+io.sockets.on('connection', function (socket) {
 
-  socket.on('display change', function(data) {
+  socket.on('display change', function (data) {
     displayType = data;
     io.sockets.volatile.emit('changed display', data);
+    netDataHandler(serverData);
+  });
+  socket.on('hostname change', function (data) {
+    currentHost = data;
+    io.sockets.volatile.emit('changed hostname', data);
     netDataHandler(serverData);
   });
 });
