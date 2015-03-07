@@ -19,7 +19,7 @@ var NET_PORT = 7555;
 var displayType = 'MEM';
 var currentHost;
 var serverData;
-var hosts;
+var hosts = {};
 
 // creating the server ( localhost:8000 )
 app.listen(WS_PORT);
@@ -44,12 +44,10 @@ function handler(req, res) {
  *   Values using pattern: CPU|MEM|SSH|HOSTNAME
  */
 function netDataHandler(data) {
-  if (!data) {
-    return;
-  }
+  console.log(data);
     serverData = data;
     io.sockets.volatile.emit('update values', displayType + "|" + serverData);
-
+console.log(serverData);
     var host = serverData.split('|').slice(-1).pop();
     if (!hosts.hasOwnProperty(host) ) {
         io.sockets.volatile.emit('update hosts', host);
@@ -57,7 +55,6 @@ function netDataHandler(data) {
     hosts[host] = serverData;
     currentHost = currentHost ? currentHost : host;
     
-    console.log(data);
     var postData = querystring.stringify({
       'access_token' : apiToken,
       // Concatenate display option as suffix for serverData.
@@ -75,8 +72,6 @@ function netDataHandler(data) {
       }
     };
 
-
-    console.log(postData);
     var req = https.request(options, function(res) {
       res.setEncoding('utf8');
       res.on('data', function (chunk) {
