@@ -16,4 +16,4 @@ end
 installed_memory = `sysctl -n hw.memsize`.to_i / 1024 / 1024 / 1000.0
 total_consumed = 0
 ['wired down', 'active', 'inactive'].each { |key| total_consumed += get_paged_memory_usage(key) }
-printf("%.2fG of %.2fG free\n", (installed_memory-total_consumed), installed_memory) # returns in gigabytes
+printf("%.2f", (total_consumed/installed_memory * 100))
