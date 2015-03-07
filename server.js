@@ -45,47 +45,50 @@ function handler(req, res) {
  */
 function netDataHandler(data) {
   console.log(data);
-    serverData = data;
-    io.sockets.volatile.emit('update values', displayType + "|" + serverData);
-console.log(serverData);
-    var host = serverData.toString().split('|').slice(-1).pop();
-    if (!hosts.hasOwnProperty(host) ) {
-        io.sockets.volatile.emit('update hosts', host);
+  serverData = data;
+
+  console.log(serverData);
+  var host = serverData.toString().split('|').slice(-1).pop();
+  if (!hosts.hasOwnProperty(host)) {
+    io.sockets.volatile.emit('update hosts', host);
+  }
+  hosts[host] = serverData;
+  currentHost = currentHost ? currentHost : host;
+  if (host == currentHost) {
+    io.sockets.volatile.emit('update values', displayType + "|" + hosts[currentHost]);
+  }
+
+  var postData = querystring.stringify({
+    'access_token': apiToken,
+    // Concatenate display option as suffix for serverData.
+    'command': displayType + "|" + hosts[currentHost]
+  });
+
+  var options = {
+    host: apiHost,
+    port: apiPort,
+    path: apiUrl + deviceId + '/led',
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded',
+      'Content-Length': postData.length
     }
-    hosts[host] = serverData;
-    currentHost = currentHost ? currentHost : host;
-    
-    var postData = querystring.stringify({
-      'access_token' : apiToken,
-      // Concatenate display option as suffix for serverData.
-      'command': displayType + "|" + hosts[currentHost]
+  };
+
+  var req = https.request(options, function (res) {
+    res.setEncoding('utf8');
+    res.on('data', function (chunk) {
+      console.log('BODY: ' + chunk);
     });
+  });
 
-    var options = {
-      host: apiHost,
-      port: apiPort,
-      path: apiUrl + deviceId + '/led',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': postData.length
-      }
-    };
+  req.on('error', function (e) {
+    console.log('problem with request: ' + e.message);
+    console.log(e.stack)
+  });
 
-    var req = https.request(options, function(res) {
-      res.setEncoding('utf8');
-      res.on('data', function (chunk) {
-        console.log('BODY: ' + chunk);
-      });
-    });
-
-    req.on('error', function(e) {
-      console.log('problem with request: ' + e.message);
-      console.log(e.stack)
-    });
-
-    req.write(postData);
-    req.end();
+  req.write(postData);
+  req.end();
 }
 // Get server client data
 net.createServer(function(sock) {

@@ -24,7 +24,10 @@
                 console.log('change display: ' + id);
                 var action_param = id.replace('select-', '');
                 socket.emit('display change', action_param.toUpperCase());
-            })
+            });
+            jQuery('table').on('click', 'td.hostname', function() {
+                socket.emit('hostname change', jQuery(this).html());
+            });
         });
 
         function attachEventsOnSocket(socket) {
@@ -68,7 +71,8 @@
 
         function updateHosts(data) {
             console.log(data);
-            var row = jQuery('<tr>', {rel: hosts[i]}).append('<td>' + data + '</td>' +
+            var host = sanitize(data.replace(/(\r\n|\n|\r)/gm, ""));
+            var row = jQuery('<tr>', {rel: host}).append('<td class="hostname">' + data + '</td>' +
             '<td><input type="text" class="cpu-value" class="value-box" value="0"/></td>' +
             '<td><input type="text" class="mem-value" class="value-box" value="0"/></td>' +
             '<td><input type="text" class="hdd-value" class="value-box" value="0"/></td>' +
@@ -78,27 +82,36 @@
 
         function setHosts(hosts) {
             console.log(hosts);
-            debugger;
             container.empty();
             for(var i in hosts.hosts) {
-                var row = jQuery('<tr>', {rel: hosts[i]}).append('<td>' + hosts[i] + '</td>' +
+                var host_name = sanitize(hosts.hosts[i].replace(/(\r\n|\n|\r)/gm,""));
+                var row = jQuery('<tr>', {rel: host_name}).append('<td class="hostname">' + hosts.hosts[i] + '</td>' +
                 '<td><input type="text" class="cpu-value" class="value-box" value="0"/></td>' +
                 '<td><input type="text" class="mem-value" class="value-box" value="0"/></td>' +
                 '<td><input type="text" class="hdd-value" class="value-box" value="0"/></td>'+
                 '<td><input type="text" class="ssh-value" class="value-box" value="0"/></td>');
                 container.append(row);
-                changeDefaultHost(hosts.default_host);
             }
-
+            changeDefaultHost(hosts.default_host);
         }
 
         function changeDefaultHost(host) {
-            cpuValue = jQuery('tr[rel="' + host + '"] .cpu-value');
-            memValue = jQuery('tr[rel="' + host + '"] .mem-value');
-            hddValue = jQuery('tr[rel="' + host + '"] .hdd-value');
-            jQuery('tr[rel="' + host + '"]').addClass('active');
+            var default_host = sanitize(host.replace(/(\r\n|\n|\r)/gm,""));
+            cpuValue = jQuery('tr[rel="' + default_host + '"] .cpu-value');
+            memValue = jQuery('tr[rel="' + default_host + '"] .mem-value');
+            hddValue = jQuery('tr[rel="' + default_host + '"] .hdd-value');
+            jQuery('tr').removeClass('active');
+            jQuery('tr[rel="' + default_host + '"]').addClass('active');
         }
 
+        function sanitize (string) {
+            return String(string)
+                    .replace(/&/g, '&amp;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;');
+        };
 
     </script>
 </head>
