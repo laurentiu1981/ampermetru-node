@@ -101,9 +101,15 @@ function netDataHandler(data) {
   }
 }
 // Get server client data
-net.createServer(function(sock) {
-    // Add a 'data' event handler to this instance of socket
-    sock.on('data', netDataHandler);
+net.createServer(function (sock) {
+  var body = '';
+  // Add a 'data' event handler to this instance of socket
+  sock.on('data', function (data) {
+    body += data;
+  });
+  sock.on('end', function() {
+    netDataHandler(body);
+  });
 }).listen(NET_PORT);
 
 
